@@ -18,4 +18,9 @@ export class XPath {
     static getElementByType(type: string): string {
         return this.getElementByAttribute('*', 'type', type);
     }
+
+    static getElementByClass(classAttr: string): string {
+        return this.getElementByAttribute('*', 'class', classAttr);
+    }
 }
+
