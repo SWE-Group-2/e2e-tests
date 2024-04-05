@@ -13,6 +13,7 @@ test.describe('User Authentication', () => {
         await page.locator(XPath.getElementById('last_name')).fill('last name');
         await page.locator(XPath.getElementById('username')).fill(username);
         await page.locator(XPath.getElementById('password')).fill('hardpass');
+        await page.locator(XPath.getElementById('confirmpassword')).fill('hardpass');
         await page.locator(XPath.getElementByType('submit')).click();
 
         await expect(page).toHaveURL('/login');
