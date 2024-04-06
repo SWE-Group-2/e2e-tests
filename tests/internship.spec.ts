@@ -2,7 +2,7 @@ import {test, expect} from '@playwright/test';
 import {XPath} from "../XPath";
 import { time } from 'console';
 
-test.describe('Internships', ()    => {
+test.describe('Internship List', () => {
     test('User can create and delete internships', async ({page}) => {
         await page.goto('/login');
         await page.locator(XPath.getElementById('username')).fill('student');
@@ -18,19 +18,26 @@ test.describe('Internships', ()    => {
         await expect(page.getByRole('button', { name: 'Submit' })).toBeVisible();
         await expect(await page.getByLabel('Internship Period')).toBeVisible();
         await expect(page.getByRole('button', { name: 'Submit' })).toBeVisible();
-        await page.getByLabel('Company').fill('Agoda');
-        await page.getByLabel('Position').fill('QA');
-        await page.getByLabel('Application Link').fill('www.agoda.com');
+
+        const company = 'Agoda';
+        const position = 'QA';
+        const company_link = 'www.agoda.com';
+        const deadline = '2024-07-20';
+
+        await page.getByLabel('Company').fill(company);
+        await page.getByLabel('Position').fill(position);
+        await page.getByLabel('Application Link').fill(company_link);
         await page.getByLabel('Internship Period').selectOption('1');
         const time_period = await page.locator(XPath.getElementById('time-period-input')).innerText();
-        await page.getByLabel('Application Deadline').fill('2024-07-20');
+        await page.getByLabel('Application Deadline').fill(deadline);
         await page.getByRole('button', { name: 'Submit' }).click();
         await expect(page).toHaveURL('/create-internship');
 
-        const internship = page.locator(XPath.getElementByClass('internship-card')).first();
+        // const internship = await page.getByRole('link', { name: 'logo QA @ Agoda Internship Period: T3 2023-2024 Application Deadline: 2024-07-20' }).first();
+        const internship = page.locator(XPath.getFirstOccuranceOfAnInternship(position, company, deadline)).first();
         await expect(internship).toBeVisible();
         await expect(internship.locator(XPath.getElementByClass('company-offer'))).toHaveText('QA');
-        await expect(internship.locator(XPath.getElementByClass('company-info')).first()).toHaveText('@ Agoda'); // company
+        await expect(internship.locator(XPath.getElementByClass('company-info')).first()).toHaveText(` @ ${company}`); // company
         await expect(internship.locator(XPath.getElementByClass('company-info')).nth(1)).toHaveText(time_period); // time period
         await expect(internship.locator(XPath.getElementByClass('company-info')).nth(2)).toHaveText('2024-07-20'); // deadline
 
@@ -39,3 +46,5 @@ test.describe('Internships', ()    => {
 
     });
 });
+
+
