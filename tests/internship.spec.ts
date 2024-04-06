@@ -24,6 +24,7 @@ test.describe('Internship', () => {
         await page.getByLabel('Application Deadline').fill(deadline);
         await page.getByRole('button', { name: 'Submit' }).click();
 
+        // go to the internship page
         await expect(page).toHaveURL(/internships/);
         const internship = await page.locator(XPath.getFirstOccuranceOfAnInternship(position, company, deadline)).first();
         await internship.click();
@@ -51,7 +52,12 @@ test.describe('Internship', () => {
         await expect(page.locator('//*[contains(text(), "Posted on:")]/following-sibling::*')).toBeVisible();
         await expect(page.locator('//*[contains(text(), "Posted on:")]/following-sibling::*')).toHaveText(/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/);
 
+        // check company link can be clicked and go to where it's supposed to
+        await page.getByText(company_link).click();
+        await expect(page).toHaveURL(company_link);
+
         // edit internship
+        await page.goto(internship_url);
         const internship_id = page.url().substring(page.url().lastIndexOf('/') + 1);
         const pfp = './utils/pfp/luffy.jpg';
         company = 'Pirate';
@@ -83,9 +89,14 @@ test.describe('Internship', () => {
         await expect(page.locator('#view-internship')).toContainText(deadline);
         await expect(page.locator('//*[@class="photo"]//img[@src]')).toBeVisible();
 
+        // check company link is updated
+        await page.getByText(company_link).click();
+        await expect(page).toHaveURL(company_link);
+
+        // delete internship
+        await page.goto(internship_url);
         await page.getByRole('button', { name: 'delete' }).click();
         await expect(page).toHaveURL(/internships/);
 
     });
-
 });
