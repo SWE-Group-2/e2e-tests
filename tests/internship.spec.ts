@@ -28,7 +28,7 @@ test.describe('Internship List', () => {
         await page.getByLabel('Position').fill(position);
         await page.getByLabel('Application Link').fill(company_link);
         await page.getByLabel('Internship Period').selectOption('1');
-        const time_period = await page.locator(XPath.getElementById('time-period-input')).innerText();
+        const time_period = await page.locator(XPath.getElementById('time-period-input')).locator('option').nth(0).innerText();
         await page.getByLabel('Application Deadline').fill(deadline);
         await page.getByRole('button', { name: 'Submit' }).click();
         await expect(page).toHaveURL('/create-internship');
