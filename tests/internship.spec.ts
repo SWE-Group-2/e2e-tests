@@ -1,6 +1,5 @@
 import {test, expect} from '@playwright/test';
 import {XPath} from "../XPath";
-import { time } from 'console';
 
 test.describe('Internship List', () => {
     test('User can view internship list', async ({page}) => {
@@ -94,10 +93,36 @@ test.describe('Internship List', () => {
         await expect(internship.locator(XPath.getElementByClass('company-info')).nth(1)).toHaveText(time_period); // time period
         await expect(internship.locator(XPath.getElementByClass('company-info')).nth(2)).toHaveText('2024-07-20'); // deadline
 
+        /**
+         * delete the internship
+         * 
+         * Id of internships cannot be obtained from the internship list or during the internship creation process,
+         * so there is no way to make sure the identified internship is actually the internship that was just created if another user
+         * created the same one right before, which is basically like a race condition. In which case, currently there is no way to identify
+         * if this is truly the internship created by the user. So it's possible that the delete button may not be accessible
+         *if it's an intenship with the same information but was created by a different user
+         **/
         await internship.click();
-        await page.getByRole('button', { name: 'delete' }).click()
+        await expect(page).toHaveURL(/internship\/[0-9]+/);
+        const internship_id = page.url().substring(page.url().lastIndexOf('/') + 1);
+        await expect(page.getByRole('button', { name: 'delete' })).toBeVisible();
+        await page.getByRole('button', { name: 'delete' }).click();
+
+        // Check if an internship with the same info is in the list. If it is not then the internship was deleted.
+        // If an internship with that info still exists, then check that it doesn't have the same id as the deleted internship.
+        await expect(page).toHaveURL(/internships/);
+        if (await internship.isVisible()) {
+            await internship.click();
+            await expect(page.url().endsWith(`/${internship_id}`)).toBeFalsy();
+        }
+    });
+
+    test('Sort and filter internships work properly', async ({page}) => {
 
     });
+
+    
 });
+
 
 
