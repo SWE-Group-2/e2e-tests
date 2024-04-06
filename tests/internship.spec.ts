@@ -12,10 +12,10 @@ test.describe('Internship', () => {
         await expect(page).toHaveURL('/create-internship');
 
         // create an internship
-        const company = 'Ocean';
-        const position = 'Backend';
-        const company_link = 'https://www.youtube.com/watch?v=nw0i4BSicsU';
-        const deadline = '2024-11-15';
+        var company = 'Ocean';
+        var position = 'Backend';
+        var company_link = 'https://www.youtube.com/watch?v=nw0i4BSicsU';
+        var deadline = '2024-11-15';
 
         await page.getByLabel('Company').fill(company);
         await page.getByLabel('Position').fill(position);
@@ -51,7 +51,38 @@ test.describe('Internship', () => {
         await expect(page.locator('//*[contains(text(), "Posted on:")]/following-sibling::*')).toBeVisible();
         await expect(page.locator('//*[contains(text(), "Posted on:")]/following-sibling::*')).toHaveText(/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/);
 
+        // edit internship
+        const internship_id = page.url().substring(page.url().lastIndexOf('/') + 1);
+        const pfp = './utils/pfp/luffy.jpg';
+        company = 'Pirate';
+        position = 'Frontend';
+        company_link = 'https://www.youtube.com/watch?v=6gVxrbYZETI';
+        deadline = '2024-06-28';
+
+        await page.getByRole('button', { name: 'edit' }).click();
+        await expect(page).toHaveURL(`/edit-internship/${internship_id}`);
+        await page.getByLabel('Company').click();
+        await page.getByLabel('Company').fill(company);
+        await page.getByLabel('Position').click();
+        await page.getByLabel('Position').fill(position);
+        await page.getByLabel('Application Link').press('Tab');
+        await page.getByLabel('Application Link').fill(company_link);
+        await page.getByLabel('Internship Period').press('Tab');
+        await page.getByLabel('Application Deadline').fill(deadline);
+        await page.locator('input[type="file"]').click();
+        await page.locator('input[type="file"]').setInputFiles(pfp);
+        await page.getByRole('button', { name: 'Submit' }).click();
+
+        // check updated internship
+        await expect(page).toHaveURL(/internships/);
         await page.goto(internship_url);
+        await expect(page.locator('#view-internship')).toContainText(company);
+        await expect(page.locator('#view-internship')).toContainText(position);
+        await expect(page.locator('#view-internship')).toContainText(company_link);
+        await expect(page.locator('#view-internship')).toContainText(time_period);
+        await expect(page.locator('#view-internship')).toContainText(deadline);
+        await expect(page.locator('//*[@class="photo"]//img[@src]')).toBeVisible();
+
         await page.getByRole('button', { name: 'delete' }).click();
         await expect(page).toHaveURL(/internships/);
 
