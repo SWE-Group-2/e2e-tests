@@ -22,5 +22,12 @@ export class XPath {
     static getElementByClass(classAttr: string): string {
         return this.getElementByAttribute('*', 'class', classAttr);
     }
+
+    // There can be duplicate internship information. So, this doesn't guarantee it's the internship a user just created
+    // even if it's presented first because it's technically possible for another user to create another one with the same info right before.
+    // This mess can be simplified or get rid of entirely if frontend label things more with attributes.
+    static getFirstOccuranceOfAnInternship(position: string, company: string, deadline: string): string {
+        return `//div[@class="internship-card"]//descendant::span[@class="company-offer" and text()="${position}"]/following-sibling::span[text()=" @ ${company}"]/../../descendant::*[contains(., "Deadline")]//span[text()="${deadline}"]/ancestor::div[@class="internship-card"]`
+    }
 }
 
